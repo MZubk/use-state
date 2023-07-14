@@ -1,22 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useState } from "react";
 
 function App() {
+  const [endereco, setEndereco] = useState("");
+
+  function manipularEndereço(event) {
+    setEndereco({
+      cep: event.target.value,
+    });
+
+    const cep = event.target.value;
+
+    setEndereco({
+      cep,
+    });
+
+    if (cep && cep.length === 8) {
+      fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then((resposta) => resposta.json())
+        .then((dados) => {
+          setEndereco((enderecoAntigo) => ({
+            ...enderecoAntigo,
+            rua: dados.logradouro,
+            bairro: dados.bairro,
+            cidade: dados.localidade,
+            estado: dados.uf,
+          }));
+        });
+    }
+  }
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <input placeholder="Digite o CEP" onChange={manipularEndereço} />
+        <ul>
+          <li>CEP: {endereco.cep}</li>
+          <li>Rua: {endereco.rua}</li>
+          <li>Bairro: {endereco.bairro}</li>
+          <li>Cidade: {endereco.cidade}</li>
+          <li>Estado: {endereco.estado}</li>
+        </ul>
       </header>
     </div>
   );
